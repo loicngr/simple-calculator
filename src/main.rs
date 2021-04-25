@@ -66,103 +66,73 @@ impl Sandbox for ScApp {
     fn update(&mut self, message: Self::Message) {
         match message {
             ScMessage::ZeroButtonPressed => {
-                match self.operator.unwrap() {
-                    ScOperator::Plus => {
-                        self.value += 0;
-                    },
-                    ScOperator::Minus => {
-                        self.value -= 0;
-                    },
+                if let ScOperator::Plus = self.operator.unwrap() {
+                    self.value += 0;
+                } else if let ScOperator::Minus = self.operator.unwrap() {
+                    self.value -= 0;
                 }
             }
             ScMessage::OneButtonPressed => {
-                match self.operator.unwrap() {
-                    ScOperator::Plus => {
-                        self.value += 1;
-                    },
-                    ScOperator::Minus => {
-                        self.value -= 1;
-                    },
+                if let ScOperator::Plus = self.operator.unwrap() {
+                    self.value += 1;
+                } else if let ScOperator::Minus = self.operator.unwrap() {
+                    self.value -= 1;
                 }
             }
             ScMessage::TwoButtonPressed => {
-                match self.operator.unwrap() {
-                    ScOperator::Plus => {
-                        self.value += 2;
-                    },
-                    ScOperator::Minus => {
-                        self.value -= 2;
-                    },
+                if let ScOperator::Plus = self.operator.unwrap() {
+                    self.value += 2;
+                } else if let ScOperator::Minus = self.operator.unwrap() {
+                    self.value -= 2;
                 }
             }
             ScMessage::ThreeButtonPressed => {
-                match self.operator.unwrap() {
-                    ScOperator::Plus => {
-                        self.value += 3;
-                    },
-                    ScOperator::Minus => {
-                        self.value -= 3;
-                    },
+                if let ScOperator::Plus = self.operator.unwrap() {
+                    self.value += 3;
+                } else if let ScOperator::Minus = self.operator.unwrap() {
+                    self.value -= 3;
                 }
             }
             ScMessage::FourButtonPressed => {
-                match self.operator.unwrap() {
-                    ScOperator::Plus => {
-                        self.value += 4;
-                    },
-                    ScOperator::Minus => {
-                        self.value -= 4;
-                    },
+                if let ScOperator::Plus = self.operator.unwrap() {
+                    self.value += 4;
+                } else if let ScOperator::Minus = self.operator.unwrap() {
+                    self.value -= 4;
                 }
             }
             ScMessage::FiveButtonPressed => {
-                match self.operator.unwrap() {
-                    ScOperator::Plus => {
-                        self.value += 5;
-                    },
-                    ScOperator::Minus => {
-                        self.value -= 5;
-                    },
+                if let ScOperator::Plus = self.operator.unwrap() {
+                    self.value += 5;
+                } else if let ScOperator::Minus = self.operator.unwrap() {
+                    self.value -= 5;
                 }
             }
             ScMessage::SixButtonPressed => {
-                match self.operator.unwrap() {
-                    ScOperator::Plus => {
-                        self.value += 6;
-                    },
-                    ScOperator::Minus => {
-                        self.value -= 6;
-                    },
+                if let ScOperator::Plus = self.operator.unwrap() {
+                    self.value += 6;
+                } else if let ScOperator::Minus = self.operator.unwrap() {
+                    self.value -= 6;
                 }
             }
             ScMessage::SevenButtonPressed => {
-                match self.operator.unwrap() {
-                    ScOperator::Plus => {
-                        self.value += 7;
-                    },
-                    ScOperator::Minus => {
-                        self.value -= 7;
-                    },
+                if let ScOperator::Plus = self.operator.unwrap() {
+                    self.value += 7;
+                } else if let ScOperator::Minus = self.operator.unwrap() {
+                    self.value -= 7;
                 }
             }
             ScMessage::EightButtonPressed => {
-                match self.operator.unwrap() {
-                    ScOperator::Plus => {
-                        self.value += 8;
-                    },
-                    ScOperator::Minus => {
-                        self.value -= 8;
-                    },
+                if let ScOperator::Plus = self.operator.unwrap() {
+                    self.value += 8;
+                } else if let ScOperator::Minus = self.operator.unwrap() {
+                    self.value -= 8;
                 }
             }
             ScMessage::NineButtonPressed => {
-                match self.operator.unwrap() {
-                    ScOperator::Plus => {
-                        self.value += 9;
-                    },
-                    ScOperator::Minus => {
-                        self.value -= 9;
-                    },
+                if let ScOperator::Plus = self.operator.unwrap() {
+                    self.value += 9;
+                } else if let ScOperator::Minus = self.operator.unwrap() {
+                    self.value -= 9;
                 }
             }
             ScMessage::MinusButtonPressed => {
