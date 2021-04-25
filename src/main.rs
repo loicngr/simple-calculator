@@ -11,25 +11,87 @@ enum ScOperator {
 }
 
 #[derive(Default)]
+struct ScButtons {
+    zero: button::State,
+    one: button::State,
+    two: button::State,
+    three: button::State,
+    four: button::State,
+    five: button::State,
+    six: button::State,
+    seven: button::State,
+    eight: button::State,
+    nine: button::State,
+    minus: button::State,
+    plus: button::State,
+    reset: button::State,
+    equal: button::State,
+}
+
+#[derive(Default)]
 struct ScApp {
-    /// The calculator value
+    state: ScState,
     value: isize,
+    /// The calculator result
+    result: isize,
+    /// Operator type
     operator: Option<ScOperator>,
     /// Buttons
-    zero_button: button::State,
-    one_button: button::State,
-    two_button: button::State,
-    three_button: button::State,
-    four_button: button::State,
-    five_button: button::State,
-    six_button: button::State,
-    seven_button: button::State,
-    eight_button: button::State,
-    nine_button: button::State,
-    minus_button: button::State,
-    plus_button: button::State,
-    reset_button: button::State,
-    equal_button: button::State,
+    buttons: ScButtons
+}
+
+#[derive(Default)]
+struct ScState {
+    result: isize,
+    cache: (Option<isize>, Option<ScOperator>, Option<isize>)
+}
+
+impl ScState {
+    fn new() -> Self {
+        ScState { result: 0, cache: (None, None, None) }
+    }
+
+    fn get_operator(&self) -> Option<ScOperator> {
+        self.cache.1
+    }
+    fn get_first(&self) -> Option<isize> {
+        self.cache.0
+    }
+    fn get_last(&self) -> Option<isize> {
+        self.cache.2
+    }
+
+    fn set_operator(&mut self, op: Option<ScOperator>) {
+        self.cache.1 = op;
+    }
+    fn set_first(&mut self, number: Option<isize>) {
+        self.cache.0 = number;
+    }
+    fn set_last(&mut self, number: Option<isize>) {
+        self.cache.2 = number;
+    }
+
+    fn result(&mut self) {
+        match self.cache.1 {
+            None => {}
+            Some(operator) => {
+                match operator {
+                    ScOperator::Minus => {
+                        self.result = self.cache.0.unwrap() - self.cache.2.unwrap();
+                    }
+                    ScOperator::Plus => {
+                        self.result =  self.cache.0.unwrap() + self.cache.2.unwrap();
+                    }
+                }
+            }
+        }
+    }
+
+    fn reset(&mut self) {
+        self.set_first(Some(self.result));
+        self.set_operator(None);
+        self.set_last(None);
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -50,12 +112,66 @@ enum ScMessage {
     EqualButtonPressed,
 }
 
+impl ScApp {
+    fn add_value(&mut self, value: isize) {
+        match self.state.get_last() {
+            Some(_) => {
+                match self.state.get_last() {
+                    Some(v) => {
+                        let value = Some(format!("{}{}", v, value).parse().unwrap());
+                        self.state.set_last(value);
+                        self.value = value.unwrap();
+                    }
+                    None => {
+                        let value = Some(value);
+                        self.state.set_last(value);
+                        self.value = value.unwrap();
+                    }
+                }
+            }
+            None => {
+                match self.state.get_operator() {
+                    None => {
+                        match self.state.get_first() {
+                            Some(v) => {
+                                let value = Some(format!("{}{}", v, value).parse().unwrap());
+                                self.state.set_first(value);
+                                self.value = value.unwrap();
+                            }
+                            None => {
+                                let value = Some(value);
+                                self.state.set_first(value);
+                                self.value = value.unwrap();
+                            }
+                        }
+                    }
+                    Some(_) => {
+                        let value = Some(value);
+                        self.state.set_last(value);
+                        self.value = value.unwrap();
+                    }
+                }
+            }
+        }
+    }
+
+    fn set_operator(&mut self, op: Option<ScOperator>) {
+        match self.state.get_operator() {
+            None => {
+                self.state.set_operator(op);
+            }
+            Some(_) => {}
+        }
+    }
+}
+
 impl Sandbox for ScApp {
     type Message = ScMessage;
 
     fn new() -> Self {
         let mut app = Self::default();
         app.operator = Some(ScOperator::Plus);
+        app.state = ScState::new();
         app
     }
 
@@ -73,80 +189,43 @@ impl Sandbox for ScApp {
                 }
             }
             ScMessage::OneButtonPressed => {
-                if let ScOperator::Plus = self.operator.unwrap() {
-                    self.value += 1;
-                } else if let ScOperator::Minus = self.operator.unwrap() {
-                    self.value -= 1;
-                }
+                self.add_value(1);
             }
             ScMessage::TwoButtonPressed => {
-                if let ScOperator::Plus = self.operator.unwrap() {
-                    self.value += 2;
-                } else if let ScOperator::Minus = self.operator.unwrap() {
-                    self.value -= 2;
-                }
+                self.add_value(2);
             }
             ScMessage::ThreeButtonPressed => {
-                if let ScOperator::Plus = self.operator.unwrap() {
-                    self.value += 3;
-                } else if let ScOperator::Minus = self.operator.unwrap() {
-                    self.value -= 3;
-                }
+                self.add_value(3);
             }
             ScMessage::FourButtonPressed => {
-                if let ScOperator::Plus = self.operator.unwrap() {
-                    self.value += 4;
-                } else if let ScOperator::Minus = self.operator.unwrap() {
-                    self.value -= 4;
-                }
+                self.add_value(4);
             }
             ScMessage::FiveButtonPressed => {
-                if let ScOperator::Plus = self.operator.unwrap() {
-                    self.value += 5;
-                } else if let ScOperator::Minus = self.operator.unwrap() {
-                    self.value -= 5;
-                }
+                self.add_value(5);
             }
             ScMessage::SixButtonPressed => {
-                if let ScOperator::Plus = self.operator.unwrap() {
-                    self.value += 6;
-                } else if let ScOperator::Minus = self.operator.unwrap() {
-                    self.value -= 6;
-                }
+                self.add_value(6);
             }
             ScMessage::SevenButtonPressed => {
-                if let ScOperator::Plus = self.operator.unwrap() {
-                    self.value += 7;
-                } else if let ScOperator::Minus = self.operator.unwrap() {
-                    self.value -= 7;
-                }
+                self.add_value(7);
             }
             ScMessage::EightButtonPressed => {
-                if let ScOperator::Plus = self.operator.unwrap() {
-                    self.value += 8;
-                } else if let ScOperator::Minus = self.operator.unwrap() {
-                    self.value -= 8;
-                }
+                self.add_value(8);
             }
             ScMessage::NineButtonPressed => {
-                if let ScOperator::Plus = self.operator.unwrap() {
-                    self.value += 9;
-                } else if let ScOperator::Minus = self.operator.unwrap() {
-                    self.value -= 9;
-                }
+                self.add_value(9);
             }
             ScMessage::MinusButtonPressed => {
-                self.operator = Some(ScOperator::Minus);
+                self.set_operator(Some(ScOperator::Minus))
             }
             ScMessage::PlusButtonPressed => {
-                self.operator = Some(ScOperator::Plus);
+                self.set_operator(Some(ScOperator::Plus))
             }
-            ScMessage::ResetButtonPressed => {
-                self.value = 0;
-                self.operator = Some(ScOperator::Plus);
-            }
+            ScMessage::ResetButtonPressed => {}
             ScMessage::EqualButtonPressed => {
-                println!("Result : {}", self.value);
+                self.state.result();
+                self.value = self.state.result;
+                self.state.reset();
             }
         }
     }
@@ -163,29 +242,33 @@ impl Sandbox for ScApp {
             )
             .push(
                 Row::with_children(vec![
-                    Element::from(Button::new(&mut self.zero_button, Text::new("0")).on_press(ScMessage::ZeroButtonPressed)),
-                    Element::from(Button::new(&mut self.one_button, Text::new("1")).on_press(ScMessage::OneButtonPressed)),
-                    Element::from(Button::new(&mut self.two_button, Text::new("2")).on_press(ScMessage::TwoButtonPressed)),
-                    Element::from(Button::new(&mut self.three_button, Text::new("3")).on_press(ScMessage::ThreeButtonPressed)),
-                    Element::from(Button::new(&mut self.four_button, Text::new("4")).on_press(ScMessage::FourButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.zero, Text::new("0")).on_press(ScMessage::ZeroButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.one, Text::new("1")).on_press(ScMessage::OneButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.two, Text::new("2")).on_press(ScMessage::TwoButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.three, Text::new("3")).on_press(ScMessage::ThreeButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.four, Text::new("4")).on_press(ScMessage::FourButtonPressed)),
                 ])
             )
             .push(
                 Row::with_children(vec![
-                    Element::from(Button::new(&mut self.five_button, Text::new("5")).on_press(ScMessage::FiveButtonPressed)),
-                    Element::from(Button::new(&mut self.six_button, Text::new("6")).on_press(ScMessage::SixButtonPressed)),
-                    Element::from(Button::new(&mut self.seven_button, Text::new("7")).on_press(ScMessage::SevenButtonPressed)),
-                    Element::from(Button::new(&mut self.eight_button, Text::new("8")).on_press(ScMessage::EightButtonPressed)),
-                    Element::from(Button::new(&mut self.nine_button, Text::new("9")).on_press(ScMessage::NineButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.five, Text::new("5")).on_press(ScMessage::FiveButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.six, Text::new("6")).on_press(ScMessage::SixButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.seven, Text::new("7")).on_press(ScMessage::SevenButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.eight, Text::new("8")).on_press(ScMessage::EightButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.nine, Text::new("9")).on_press(ScMessage::NineButtonPressed)),
                 ])
             )
             .push(
                 Row::with_children(vec![
                     Element::from(
-                        Button::new(&mut self.plus_button, Text::new("+")).on_press(ScMessage::PlusButtonPressed)),
-                    Element::from(Button::new(&mut self.minus_button, Text::new("-")).on_press(ScMessage::MinusButtonPressed)),
-                    Element::from(Button::new(&mut self.equal_button, Text::new("=")).on_press(ScMessage::EqualButtonPressed)),
+                        Button::new(&mut self.buttons.plus, Text::new("+")).on_press(ScMessage::PlusButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.minus, Text::new("-")).on_press(ScMessage::MinusButtonPressed)),
+                    Element::from(Button::new(&mut self.buttons.equal, Text::new("=")).on_press(ScMessage::EqualButtonPressed)),
                 ])
+            )
+            .push(
+                Row::new()
+                    .push(Text::new(self.state.result.to_string()).size(50))
             )
             .into()
     }
